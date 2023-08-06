@@ -1,3 +1,4 @@
+const nodemailer = require("nodemailer");
 module.exports = async ({ from, to, subject, text, html}) => {
         let transporter = nodemailer.createTransport({
             host: process.env.SMTP_HOST,
@@ -11,7 +12,7 @@ module.exports = async ({ from, to, subject, text, html}) => {
 
         // send mail with defined transport object
     let info = await transporter.sendMail({
-        from: `snapsend <${from}>`, // sender address
+        from: `inShare <${from}>`, // sender address
         to: to, // list of receivers
         subject: subject, // Subject line
         text: text, // plain text body

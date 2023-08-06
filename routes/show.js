@@ -1,21 +1,18 @@
+const router = require('express').Router();
+const File = require('../models/file');
 
-module.exports = async ({ from, to, subject, text, html}) => {
-        let transporter = nodemailer.createTransport({
-            host: process.env.SMTP_HOST,
-            port: process.env.SMTP_PORT,
-            secure: false, // true for 465, false for other ports
-            auth: {
-                user: process.env.MAIL_USER, // generated ethereal user
-                pass: process.env.MAIL_PASSWORD, // generated ethereal password
-            },
-        });
+router.get('/:uuid', async (req, res) => {
+    try {
+        const file = await File.findOne({ uuid: req.params.uuid });
+        // Link expired
+        if(!file) {
+            return res.render('download', { error: 'Link has been expired.'});
+        } 
+        return res.render('download', { uuid: file.uuid, fileName: file.filename, fileSize: file.size, downloadLink: `${process.env.APP_BASE_URL}/files/download/${file.uuid}` });
+    } catch(err) {
+        return res.render('download', { error: 'Something went wrong.'});
+    }
+});
 
-        // send mail with defined transport object
-    let info = await transporter.sendMail({
-        from: `snapsend<${from}>`, // sender address
-        to: to, // list of receivers
-        subject: subject, // Subject line
-        text: text, // plain text body
-        html: html, // html body
-    });
-}
+
+module.exports = router;
